@@ -35,6 +35,9 @@ fun module() {
     skip(MODULE)
     check(NAME)
     table.enterItem(Module(name))
+    //--------------
+    System.out.println("public class $name() {")
+    //--------------
     nextLex()
     skip(SEMI)
     if (lex == IMPORT) {
@@ -42,6 +45,7 @@ fun module() {
     }
     declSeq()
     if (lex == BEGIN) {
+        System.out.println("public static void main(String[] args) {")
         nextLex()
         statSeq()
     }
@@ -120,9 +124,13 @@ fun callStatement() {
         procName = procName + "."
         check(NAME)
         procName = procName + name
-        nextLex();
+        //todo
+        System.out.print(procName)
+        nextLex()
     } else if (x is StProc && x.type == UNIT) {
         procName = name
+        //todo
+        System.out.println(procName)
         nextLex()
     } else
         expect("обозначение процедуры")
@@ -134,47 +142,57 @@ fun stProc(pname: String) {
     when (pname) {
         "Out.Ln" -> {
             if (lex == L_PAR) {
+                System.out.print("(")
                 nextLex()
                 skip(R_PAR)
-
+                System.out.println(");")
             }
             Gen(cmOUTLN)
         }
         "In.Open" -> {
             if (lex == L_PAR) {
+                System.out.print("(")
                 nextLex()
                 skip(R_PAR)
+                System.out.println(");")
             }
         }
         "Out.Int" -> {
             skip(L_PAR)
+            System.out.print("(")
             intExpr()
             skip(COMMA)
             intExpr()
             skip(R_PAR)
+            System.out.println(");")
             Gen(cmOUT)
         }
         "In.Int" -> {
             skip(L_PAR)
+            System.out.print("(")
             variable()
             skip(R_PAR)
+            System.out.println(");")
             Gen(cmIN)
             Gen(cmSAVE)
         }
         "HALT" -> {
             skip(L_PAR)
+            System.out.print("(")
             var c = constExpr()
             skip(R_PAR)
+            System.out.println("$c);")
             GenConst(c)
             Gen(cmSTOP)
         }
         "DEC" -> {
             skip(L_PAR)
+            System.out.print("(")
             variable()
             Gen(cmDUP)
             Gen(cmLOAD)
             if (lex == COMMA) {
-                nextLex();
+                nextLex()
                 intExpr()
             } else {
                 Gen(1)
@@ -182,9 +200,11 @@ fun stProc(pname: String) {
             Gen(cmSUB)
             Gen(cmSAVE)
             skip(R_PAR)
+            System.out.println(");")
         }
         "INC" -> {
             skip(L_PAR)
+            System.out.print("(")
             variable()
             Gen(cmDUP)
             Gen(cmLOAD)
@@ -197,6 +217,7 @@ fun stProc(pname: String) {
             Gen(cmADD)
             Gen(cmSAVE)
             skip(R_PAR)
+            System.out.println(");")
         }
 
     }
@@ -210,6 +231,7 @@ fun intExpr() {
 fun whileStatement() {
     val WhilePC = PC
     skip(WHILE)
+    System.out.print("while (")
     boolExpr()
     val CondPC = PC
     skip(DO)
@@ -267,6 +289,7 @@ fun Expression(): Types {
     var T = SimpleExpr()
     if (lex in setOf(EQ, NE, GT, GE, LT, LE)) {
         val Op = lex
+        System.out.print(opToCompSign(Op))
         TestInt(T)
         nextLex()
         T = SimpleExpr()
@@ -277,11 +300,28 @@ fun Expression(): Types {
     return T
 }
 
+fun opToCompSign(op: Lex): String {
+    var s = ""
+    when (op) {
+        EQ -> s = "=="
+        NE -> s = "!="
+        GE -> s = ">="
+        GT -> s = ">"
+        LE -> s = "<="
+        LT -> s = "<"
+        PLUS -> s = "+"
+        MINUS -> s = "-"
+        ASSIGN -> s = "="
+    }
+    return s
+}
+
 // ["+"|"-"] Слагаемое {("+" | "-") Слагаемое}
 fun SimpleExpr(): Types {
     var T: Types
     if (lex in setOf(PLUS, MINUS)) {
         var Op = lex
+        System.out.print(opToCompSign(Op))
         nextLex()
         T = Term()
         TestInt(T)
@@ -368,7 +408,7 @@ fun stFunc(name: String) {
     when (name) {
         "ABS" -> {
             intExpr()
-            Gen(cmDUP); // x, x
+            Gen(cmDUP) // x, x
             Gen(0)
             Gen(PC + 3)
             Gen(cmIFGE)
@@ -409,6 +449,7 @@ fun assStatement() {
     skip(ASSIGN)
     val T = Expression()
     TestInt(T)
+    System.out.println("$T;")
     Gen(cmSAVE)
 }
 
@@ -417,8 +458,10 @@ fun variable() {
     var x = table.find(name)
     if (x !is Var)
         expect("переменная")
-    else
+    else {
         GenAddr(x)
+        System.out.print(name)
+    }
     nextLex()
 }
 
@@ -451,6 +494,7 @@ fun varDecl() {
         nextLex()
         check(NAME)
         table.newItem(Var(name, Types.INTEGER))
+        System.out.println("int $name;")
         nextLex()
     }
     skip(COLON)
@@ -469,11 +513,12 @@ fun type(): Types {
 // Имя "=" КонстВыраж.
 fun constDecl() {
     check(NAME)
-    val cname = name;
+    val cname = name
     nextLex()
     skip(EQ)
     val c = constExpr()
     table.newItem(Const(cname, c))
+    System.out.println("final public $name = $c;")
 }
 
 // ["+" | "-"] (Число | Имя)
@@ -503,9 +548,12 @@ fun constExpr(): Int {
 
 fun importName() {
     check(NAME)
-    if (name == "In" || name == "Out")
+    if (name == "Out")
         table.newItem(Module(name))
-    else
+    else if (name == "In") {
+        table.newItem(Module(name))
+        System.out.println("Scanner in = new Scanner();")
+    } else
         ctxError("Неизвестный модуль")
     nextLex()
 }

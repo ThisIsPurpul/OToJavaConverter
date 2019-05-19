@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
     try {
         resetText(args)
         compile()
-        showCode()
+        //showCode()
         closeText()
         run()
     } catch (e: FileNotFoundException) {
