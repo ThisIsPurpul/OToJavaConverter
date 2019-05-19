@@ -32,15 +32,13 @@ fun nextCh() {
         val c = n.toChar()
         if (c == '\n') {
             ch = chEOL
-            //todo: commentoutput too
-            //println()
+            println()
             pos = 0
         } else if (c == '\r')
             nextCh()
         else {
             ch = c
-            //todo: comment output
-            //System.out.write(ch.toInt())
+            System.out.write(ch.toInt())
             pos++
         }
     }
