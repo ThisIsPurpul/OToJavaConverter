@@ -1,0 +1,35 @@
+MODULE Primes;
+(* Простые числа от 2 до n *)
+
+IMPORT
+   Out, In;
+
+CONST
+    w = 8;
+VAR
+   i, n, d: INTEGER;
+   c: INTEGER;
+BEGIN
+  In.Open();
+  In.Int(n);
+   i := 2;
+   WHILE i <= n DO
+      d := 2;
+      WHILE i MOD d # 0 DO
+          d := d + 1;
+      END;
+      IF d = i THEN
+         Out.Int(i, w);
+         INC(c);
+      ELSIF d > i THEN
+         d := d
+      ELSE
+        i := i
+      END;
+      i := i + 1;
+   END;
+   Out.Ln();
+   Out.Int(c, 0);
+   Out.Ln();
+
+END Primes.
