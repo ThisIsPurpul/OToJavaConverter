@@ -106,6 +106,8 @@ fun statement() {
         ifStatement()
     } else if (lex == WHILE) {
         whileStatement()
+    } else if (lex == CASE) {
+        caseStatement()
     } // Пустой оператор
 }
 
@@ -259,6 +261,15 @@ fun ifStatement() {
 
     fixup(LastGOTO)
 
+}
+//TODO: caseStatement
+fun caseStatement() {
+    skip(CASE)
+    variable()
+    skip(OF)
+    check(NAME)
+    table.newItem(Var(name, Types.INTEGER))
+    nextLex()
 }
 
 
