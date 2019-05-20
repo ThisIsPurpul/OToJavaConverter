@@ -1,0 +1,23 @@
+MODULE Primes;
+(* Простые числа от 2 до n *)
+
+IMPORT
+   Out, In;
+
+CONST
+    w = 8;
+VAR
+   i, n, d: INTEGER;
+   c: INTEGER;
+BEGIN
+    In.Open();
+   CASE c + n * 2 OF
+        i, c, n : i := n + d;
+            i := n + d;
+        |n : i := n + d;
+            i := n + d;
+        |n : i := n + d;
+            i := n + d;
+        ELSE i := n;
+   END;
+END Primes.

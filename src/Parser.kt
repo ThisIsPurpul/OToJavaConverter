@@ -229,7 +229,7 @@ fun whileStatement() {
 // [ELSE
 //    ПослОператоров]
 // END
-fun ifStatement() {
+fun ifStatement() {  //todo: IF here
     var LastGOTO = 0
     skip(IF)
     boolExpr()
@@ -266,23 +266,27 @@ fun ifStatement() {
 //TODO: caseStatement
 fun caseStatement() {
     skip(CASE)
-    variable()
+    //variable()
+    SimpleExpr()
     skip(OF)
-    check(NAME)
-    table.newItem(Var(name, Types.INTEGER))
-    nextLex()
     variable()
-    skip(ASSIGN)
+    while (lex == COMMA){
+        nextLex()
+        variable()
+    }
+    skip(COLON)
     statSeq()
     while (lex == V_BAR) {
+        nextLex()
         variable()
-        skip(ASSIGN)
+        skip(COLON)
         statSeq()
     }
     if (lex == ELSE) {
         nextLex()
         statSeq()
     }
+    skip(END)
 }
 
 
@@ -490,10 +494,10 @@ fun type(): Types {
     return (x as Type).type
 }
 
-// Имя "=" КонстВыраж.
+// Имя "=" КонстВыраж. //todo: const declaration
 fun constDecl() {
     check(NAME)
-    val cname = name;
+    val cname = name
     nextLex()
     skip(EQ)
     val c = constExpr()

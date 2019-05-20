@@ -64,14 +64,14 @@ val kw = mapOf(
     "TO" to Lex.NONE,
     "REPEAT" to Lex.NONE,
     "BY" to Lex.NONE,
-    "CASE" to Lex.NONE,
+    "CASE" to Lex.CASE,
     "EXIT" to Lex.NONE,
     "LOOP" to Lex.NONE,
     "UNTIL" to Lex.NONE,
     "IN" to Lex.NONE,
     "IS" to Lex.NONE,
     "NIL" to Lex.NONE,
-    "OF" to Lex.NONE,
+    "OF" to Lex.OF,
     "OR" to Lex.NONE,
     "PROCEDURE" to Lex.NONE,
     "RETURN" to Lex.NONE,
@@ -157,6 +157,10 @@ fun nextLex() {
         }
         ')' -> {
             lex = R_PAR
+            nextCh()
+        }
+        '|' ->{
+            lex = V_BAR
             nextCh()
         }
         chEOT -> {
