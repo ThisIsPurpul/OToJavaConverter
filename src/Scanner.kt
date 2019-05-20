@@ -4,7 +4,7 @@ import Lex.*
 enum class Lex {
     NONE, NAME, NUM, MODULE, IMPORT, CONST, VAR, BEGIN, END, IF, CASE, OF, WITH, THEN,
     ELSE, ELSIF, WHILE, DO, ASSIGN, COMMA, DOT, COLON, SEMI,
-    PLUS, MINUS, MULT, DIV, MOD, EQ, NE, GT, GE, LT, LE, L_PAR, R_PAR,
+    PLUS, MINUS, MULT, DIV, MOD, EQ, NE, GT, GE, LT, LE, L_PAR, R_PAR,V_BAR,
     EOT;
 
     override fun toString(): String {
@@ -27,6 +27,7 @@ enum class Lex {
             ASSIGN -> "\":=\""
             L_PAR -> "\"(\""
             R_PAR -> "\")\""
+            V_BAR -> "\"|\""
             EOT -> "конец текста"
             else -> super.toString()
         }
@@ -76,7 +77,6 @@ val kw = mapOf(
     "RETURN" to Lex.NONE,
     "TYPE" to Lex.NONE,
     "WITH" to Lex.NONE
-
 )
 
 fun nextLex() {

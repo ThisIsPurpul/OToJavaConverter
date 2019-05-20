@@ -262,6 +262,7 @@ fun ifStatement() {
     fixup(LastGOTO)
 
 }
+
 //TODO: caseStatement
 fun caseStatement() {
     skip(CASE)
@@ -270,6 +271,18 @@ fun caseStatement() {
     check(NAME)
     table.newItem(Var(name, Types.INTEGER))
     nextLex()
+    variable()
+    skip(ASSIGN)
+    statSeq()
+    while (lex == V_BAR) {
+        variable()
+        skip(ASSIGN)
+        statSeq()
+    }
+    if (lex == ELSE) {
+        nextLex()
+        statSeq()
+    }
 }
 
 
