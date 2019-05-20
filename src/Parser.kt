@@ -262,12 +262,15 @@ fun ifStatement() {  //todo: IF here
     fixup(LastGOTO)
 
 }
-
+//-> сохранить вычисления выражения в стек
+//-> сравнивать с ним каждую из меток варианта
+//-> если значение метки совпало с ожидаемым, то выполнять последовательность операторов
+//-> выход из кейса
 //TODO: caseStatement
 fun caseStatement() {
     skip(CASE)
     //variable()
-    SimpleExpr()
+    intExpr()
     skip(OF)
     variable()
     while (lex == COMMA){
