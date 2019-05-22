@@ -122,7 +122,7 @@ fun callStatement() {
         procName = procName + "."
         check(NAME)
         procName = procName + name
-        nextLex();
+        nextLex()
     } else if (x is StProc && x.type == UNIT) {
         procName = name
         nextLex()
@@ -262,34 +262,51 @@ fun ifStatement() {  //todo: IF here
     fixup(LastGOTO)
 
 }
+
 //-> сохранить вычисления выражения в стек
 //-> сравнивать с ним каждую из меток варианта
+//-> проверку типа вариантов также необходимо произвести (скорее еще при компиляции)
+//-> метки могут быть представлены диапазонами (н-р.   1..5)
+//-> пересечения диапазонов недопустимы т.е. каждая метка встречается единожды, иначе - ошибка
+//-> встретив нужную нам метку, мы должны позаботиться о ее удалении из стека
+//-> при сравнении же с выражением мы должЫны дублировать ее во избежание потери данной
 //-> если значение метки совпало с ожидаемым, то выполнять последовательность операторов
 //-> выход из кейса
 //TODO: caseStatement
 fun caseStatement() {
     skip(CASE)
-    //variable()
-    intExpr()
-    skip(OF)
-    variable()
-    while (lex == COMMA){
-        nextLex()
-        variable()
+    //intExpr()
+    var LastGOTO = 0   //предыдущего перехода нет
+    var x = table.find(name)
+    if ( true ) {
+        intExpr()
+        Gen(cmLOAD)
     }
-    skip(COLON)
-    statSeq()
-    while (lex == V_BAR) {
+    var CondPC = PC    //Запомн. положение усл. перехода
+    skip(OF)
+    SimpleExpr()
+    do {
+        Gen(LastGOTO)
+        Gen(cmGOTO)
+        LastGOTO = PC
         nextLex()
-        variable()
+        fixup(CondPC)
+        boolExpr()
+        CondPC = PC
         skip(COLON)
         statSeq()
-    }
+    } while (lex == V_BAR)
     if (lex == ELSE) {
+        Gen(LastGOTO)
+        Gen(cmGOTO)
+        LastGOTO = PC
         nextLex()
+        fixup(CondPC)
         statSeq()
-    }
+    } else
+        fixup(CondPC)
     skip(END)
+    fixup(LastGOTO)
 }
 
 

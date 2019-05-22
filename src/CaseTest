@@ -12,7 +12,7 @@ VAR
 BEGIN
     In.Open();
    CASE c + n * 2 OF
-        i, c, n : i := n + d;
+        i: i := n + d;
             i := n + d;
         |n : i := n + d;
             i := n + d;
