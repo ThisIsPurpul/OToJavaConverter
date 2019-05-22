@@ -277,25 +277,38 @@ fun caseStatement() {
     skip(CASE)
     //intExpr()
     var LastGOTO = 0   //предыдущего перехода нет
-    var x = table.find(name)
-    if ( true ) {
-        intExpr()
-        Gen(cmLOAD)
-    }
+//    var x = table.find(name)
+//    if ( true ) {
+//        intExpr()
+//        Gen(cmLOAD)
+//    }
+    intExpr()
+    Gen(cmLOAD)
     var CondPC = PC    //«апомн. положение усл. перехода
     skip(OF)
-    SimpleExpr()
+    //todo: написать метод дл€ отлова меток
+    //comparisonWithMark()
+    Gen(LastGOTO)
+    Gen(cmGOTO)
+    LastGOTO = PC
+//nextLex()
+//    fixup(CondPC)
+    intExpr()
+    CondPC = PC
+    skip(COLON)
+    statSeq()
     do {
         Gen(LastGOTO)
         Gen(cmGOTO)
         LastGOTO = PC
         nextLex()
         fixup(CondPC)
-        boolExpr()
+        intExpr()
         CondPC = PC
         skip(COLON)
         statSeq()
     } while (lex == V_BAR)
+
     if (lex == ELSE) {
         Gen(LastGOTO)
         Gen(cmGOTO)
@@ -307,6 +320,10 @@ fun caseStatement() {
         fixup(CondPC)
     skip(END)
     fixup(LastGOTO)
+}
+
+fun comparisonWithMark() {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 }
 
 
