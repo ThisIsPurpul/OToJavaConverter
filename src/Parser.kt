@@ -299,11 +299,14 @@ fun caseStatement() {
 
 //множество, единичный мариант
 fun caseVariants() {
-    var expValue = constExpr()                                //dozen
+    var expValue = 0
+    var secValue = 0
+
+    expValue = constExpr()                                //dozen
     if (lex == DOT) {
         nextLex()
         skip(DOT)
-        var secValue = constExpr()
+        secValue = constExpr()
         for (i in expValue..secValue) {
             if (variables[i])
                 expect("уникальная метка варианта")
@@ -317,15 +320,19 @@ fun caseVariants() {
     while (lex == COMMA) {                                     //variant
         nextLex()
         expValue = constExpr()                                 //dozen
-        if (variables[expValue])
-            expect("уникальная метка варианта")
-        variables.add(expValue, true)
         if (lex == DOT) {
             nextLex()
             skip(DOT)
-            expValue = constExpr()                                 //dozen
+            secValue = constExpr()
+            for (i in expValue..secValue) {
+                if (variables[i])
+                    expect("уникальная метка варианта")
+                variables.add(i, true)
+            }
+        } else {
             if (variables[expValue])
                 expect("уникальная метка варианта")
+            variables.add(expValue, true)
         }
     }
 }
