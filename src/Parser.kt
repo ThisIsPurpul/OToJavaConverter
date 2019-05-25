@@ -612,6 +612,33 @@ fun constExpr(): Int {
     return c
 }
 
+// ["+" | "-"] (Число | Имя)
+fun constExprVarExpr(): Int {
+    var c: Int = 1
+    if (lex == PLUS)
+        nextLex()
+    else if (lex == MINUS) {
+        c = -1
+        nextLex()
+    }
+    if (lex == NUM) {
+        c = c * num
+        nextLex()
+    } else if (lex == NAME) {
+        val x = table.find(name)
+        if (x is Const) {
+            c = c * x.value
+        } else if (x is Var) {
+            c = c * x.value
+        } else
+            expect("константа или проинициализированная переменная")
+        nextLex()
+    } else {
+        expect("число или имя")
+    }
+    return c
+}
+
 fun importName() {
     check(NAME)
     if (name == "In" || name == "Out")
