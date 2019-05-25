@@ -1,6 +1,7 @@
 // –аспознаватель
 import Lex.*
 import Types.*
+import com.sun.org.apache.bcel.internal.generic.IFNE
 
 fun compile() {
     nextLex()
@@ -275,24 +276,40 @@ fun ifStatement() {  //todo: IF here
 //TODO: caseStatement
 fun caseStatement() {
     skip(CASE)
-    //intExpr()
     var LastGOTO = 0   //предыдущего перехода нет
-//    var x = table.find(name)
-//    if ( true ) {
-//        intExpr()
-//        Gen(cmLOAD)
-//    }
     intExpr()
-    Gen(cmLOAD)
+    Gen(cmDUP)
     var CondPC = PC    //«апомн. положение усл. перехода
-    skip(OF)
-    //todo: написать метод дл€ отлова меток
-    //comparisonWithMark()
-    Gen(LastGOTO)
+    check(OF)
+    do {
+        nextLex()
+        intExpr()
+        if (lex == COMMA) {
+            nextLex()
+
+            skip(COLON)
+        } else if (lex == DOT) {
+            nextLex()
+            skip(DOT)
+
+            skip(COLON)
+        } else {
+            skip(COLON)
+            Gen(LastGOTO)
+            Gen(cmGOTO)
+            LastGOTO = PC
+            Gen(cmIFNE)
+            Gen(cmDROP)
+            statSeq()
+//            fixup(CondPC)
+            Gen(cmGOTO)
+        }
+    }while (lex == V_BAR)
+
+
+/*    Gen(LastGOTO)
     Gen(cmGOTO)
     LastGOTO = PC
-//nextLex()
-//    fixup(CondPC)
     intExpr()
     CondPC = PC
     skip(COLON)
@@ -319,11 +336,11 @@ fun caseStatement() {
     } else
         fixup(CondPC)
     skip(END)
-    fixup(LastGOTO)
+    fixup(LastGOTO)*/
 }
 
 fun comparisonWithMark() {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    intExpr()
 }
 
 

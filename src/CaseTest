@@ -14,7 +14,7 @@ BEGIN
    CASE c + n * 2 OF
         i: i := n + d;
             i := n + d;
-        |n : i := n + d;
+        |n, n : i := n + d;
             i := n + d;
         |n : i := n + d;
             i := n + d;

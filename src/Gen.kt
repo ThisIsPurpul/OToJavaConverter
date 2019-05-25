@@ -9,7 +9,7 @@ fun Gen(cmd: Int) {
 }
 
 fun GenConst(c: Int) {
-    Gen(abs(c));
+    Gen(abs(c))
     if (c < 0)
         Gen(cmNEG)
 }
