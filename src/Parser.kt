@@ -287,10 +287,12 @@ fun caseStatement() {
         if (lex == COMMA) {
             nextLex()
 
+
             skip(COLON)
         } else if (lex == DOT) {
             nextLex()
             skip(DOT)
+
 
             skip(COLON)
         } else {
