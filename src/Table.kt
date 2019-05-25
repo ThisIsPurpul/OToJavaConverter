@@ -13,7 +13,7 @@ class Type(name: String, val type: Types) : Item(name) {
 
 class Const(name: String, val value: Int) : Item(name) {
     val type = INTEGER
- }
+}
 
 class Module(name: String) : Item(name) {
 }

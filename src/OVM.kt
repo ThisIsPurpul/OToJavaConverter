@@ -29,96 +29,96 @@ const val cmOUTLN = -23
 
 fun run() {
     var PC = 0
-    var SP = MEM_SIZE
+    var stackPointer = MEM_SIZE
 
     loop@ while (true) {
         val cmd = M[PC++]
         if (cmd >= 0)
-            M[--SP] = cmd
+            M[--stackPointer] = cmd
         else {
             when (cmd) {
                 cmADD -> {
-                    SP++
-                    M[SP] += M[SP - 1]
+                    stackPointer++
+                    M[stackPointer] += M[stackPointer - 1]
                 }
                 cmSUB -> {
-                    SP++
-                    M[SP] -= M[SP - 1]
+                    stackPointer++
+                    M[stackPointer] -= M[stackPointer - 1]
                 }
                 cmMULT -> {
-                    SP++
-                    M[SP] *= M[SP - 1]
+                    stackPointer++
+                    M[stackPointer] *= M[stackPointer - 1]
                 }
                 cmDIV -> {
-                    SP++
-                    M[SP] /= M[SP - 1]
+                    stackPointer++
+                    M[stackPointer] /= M[stackPointer - 1]
                 }
                 cmMOD -> {
-                    SP++
-                    M[SP] %= M[SP - 1]
+                    stackPointer++
+                    M[stackPointer] %= M[stackPointer - 1]
                 }
-                cmNEG -> M[SP] = -M[SP]
-                cmLOAD -> M[SP] = M[M[SP]]
+                cmNEG -> M[stackPointer] = -M[stackPointer]
+                cmLOAD -> M[stackPointer] = M[M[stackPointer]]
                 cmSAVE -> {
-                    M[M[SP + 1]] = M[SP]
-                    SP += 2
+                    M[M[stackPointer + 1]] = M[stackPointer]
+                    stackPointer += 2
                 }
                 cmDUP -> {
-                    SP--
-                    M[SP] = M[SP + 1]
+                    stackPointer--
+                    M[stackPointer] = M[stackPointer + 1]
                 }
-                cmDROP -> SP++
+                cmDROP -> stackPointer++
                 cmSWAP -> {
-                    val buf = M[SP]
-                    M[SP] = M[SP + 1]
-                    M[SP + 1] = buf
+                    val buf = M[stackPointer]
+                    M[stackPointer] = M[stackPointer + 1]
+                    M[stackPointer + 1] = buf
                 }
                 cmOVER -> {
-                    SP--
-                    M[SP] = M[SP + 2]
+                    stackPointer--
+                    M[stackPointer] = M[stackPointer + 2]
                 }
-                cmGOTO -> PC = M[SP++]
+                cmGOTO -> PC = M[stackPointer++]
                 cmIFEQ -> {
-                    if (M[SP + 2] == M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] == M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIFNE -> {
-                    if (M[SP + 2] != M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] != M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIFLE -> {
-                    if (M[SP + 2] <= M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] <= M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIFLT -> {
-                    if (M[SP + 2] < M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] < M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIFGE -> {
-                    if (M[SP + 2] >= M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] >= M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIFGT -> {
-                    if (M[SP + 2] > M[SP + 1])
-                        PC = M[SP]
-                    SP += 3
+                    if (M[stackPointer + 2] > M[stackPointer + 1])
+                        PC = M[stackPointer]
+                    stackPointer += 3
                 }
                 cmIN -> {
                     print('?')
-                    M[--SP] = readInt()
+                    M[--stackPointer] = readInt()
                 }
                 cmOUT -> {
-                    val w = (M[SP] - (M[SP + 1]).toString().length)
+                    val w = (M[stackPointer] - (M[stackPointer + 1]).toString().length)
                     for (i in 1..w)
                         print(" ")
-                    print(M[SP + 1])
+                    print(M[stackPointer + 1])
                     //print("%${M[SP]}d".format(M[SP + 1]))
-                    SP += 2
+                    stackPointer += 2
                 }
                 cmOUTLN -> println()
                 cmSTOP -> break@loop
@@ -129,8 +129,8 @@ fun run() {
         }
     }
     println()
-    if (SP < MEM_SIZE)
-        println("Код возврата ${M[SP]}")
+    if (stackPointer < MEM_SIZE)
+        println("Код возврата ${M[stackPointer]}")
 }
 
 fun readInt(): Int {
@@ -143,7 +143,7 @@ fun readInt(): Int {
 }
 
 fun showCode() {
-    for (i in 0 until PC) {
+    for (i in 0 until programCounter) {
         print("$i) ")
         println(
             when (M[i]) {

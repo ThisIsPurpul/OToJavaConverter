@@ -1,7 +1,6 @@
 // Распознаватель
 import Lex.*
 import Types.*
-import com.sun.org.apache.bcel.internal.generic.IFNE
 
 fun compile() {
     nextLex()
@@ -66,7 +65,7 @@ fun allocateVariables() {
     for (item in table.lastScope()) {
         if (item is Var) {
             fixup(item.lastAddr)
-            M[PC++] = 0
+            M[programCounter++] = 0
         }
     }
 }
@@ -109,7 +108,7 @@ fun statement() {
         whileStatement()
     } else if (lex == CASE) {
         caseStatement()
-    } // Пустой оператор
+    }
 }
 
 fun callStatement() {
@@ -211,10 +210,10 @@ fun intExpr() {
 }
 
 fun whileStatement() {
-    val WhilePC = PC
+    val WhilePC = programCounter
     skip(WHILE)
     boolExpr()
-    val CondPC = PC
+    val CondPC = programCounter
     skip(DO)
     statSeq()
     skip(END)
@@ -234,24 +233,24 @@ fun ifStatement() {  //todo: IF here
     var LastGOTO = 0
     skip(IF)
     boolExpr()
-    var CondPC = PC
+    var CondPC = programCounter
     skip(THEN)
     statSeq()
     while (lex == ELSIF) {
         Gen(LastGOTO)
         Gen(cmGOTO)
-        LastGOTO = PC
+        LastGOTO = programCounter
         nextLex()
         fixup(CondPC)
         boolExpr()
-        CondPC = PC
+        CondPC = programCounter
         skip(THEN)
         statSeq()
     }
     if (lex == ELSE) {
         Gen(LastGOTO)
         Gen(cmGOTO)
-        LastGOTO = PC
+        LastGOTO = programCounter
         nextLex()
         fixup(CondPC)
         statSeq()
@@ -274,56 +273,78 @@ fun ifStatement() {  //todo: IF here
 //-> если значение метки совпало с ожидаемым, то выполнять последовательность операторов
 //-> выход из кейса
 //TODO: caseStatement
+
+//массив для меток
+val variables = ArrayList<Boolean>()
 fun caseStatement() {
     skip(CASE)
-    var LastGOTO = 0   //предыдущего перехода нет
     intExpr()
-    Gen(cmDUP)
-    var CondPC = PC    //Запомн. положение усл. перехода
-    check(OF)
-    do {
+    skip(OF)
+    caseVariants()
+    skip(COLON)
+    statSeq()
+    while (lex == V_BAR) {
         nextLex()
-        intExpr()
-        if (lex == COMMA) {
-            nextLex()
+        caseVariants()
+        skip(COLON)
+        statSeq()
+    }
 
+    if (lex == ELSE) {
+        nextLex()
+        statSeq()
+    }
+    skip(END)
+}
 
-            skip(COLON)
-        } else if (lex == DOT) {
+//множество, единичный мариант
+fun caseVariants() {
+    var expValue = constExpr()                                //dozen
+    if (lex == DOT) {
+        nextLex()
+        skip(DOT)
+        var secValue = constExpr()
+        for (i in expValue..secValue) {
+            if (variables[i])
+                expect("уникальная метка варианта")
+            variables.add(i, true)
+        }
+    } else {
+        if (variables[expValue])
+            expect("уникальная метка варианта")
+        variables.add(expValue, true)
+    }
+    while (lex == COMMA) {                                     //variant
+        nextLex()
+        expValue = constExpr()                                 //dozen
+        if (variables[expValue])
+            expect("уникальная метка варианта")
+        variables.add(expValue, true)
+        if (lex == DOT) {
             nextLex()
             skip(DOT)
-
-
-            skip(COLON)
-        } else {
-            skip(COLON)
-            Gen(LastGOTO)
-            Gen(cmGOTO)
-            LastGOTO = PC
-            Gen(cmIFNE)
-            Gen(cmDROP)
-            statSeq()
-//            fixup(CondPC)
-            Gen(cmGOTO)
+            expValue = constExpr()                                 //dozen
+            if (variables[expValue])
+                expect("уникальная метка варианта")
         }
-    }while (lex == V_BAR)
-
+    }
+}
 
 /*    Gen(LastGOTO)
     Gen(cmGOTO)
-    LastGOTO = PC
+    LastGOTO = programCounter
     intExpr()
-    CondPC = PC
+    CondPC = programCounter
     skip(COLON)
     statSeq()
     do {
         Gen(LastGOTO)
         Gen(cmGOTO)
-        LastGOTO = PC
+        LastGOTO = programCounter
         nextLex()
         fixup(CondPC)
         intExpr()
-        CondPC = PC
+        CondPC = programCounter
         skip(COLON)
         statSeq()
     } while (lex == V_BAR)
@@ -331,7 +352,7 @@ fun caseStatement() {
     if (lex == ELSE) {
         Gen(LastGOTO)
         Gen(cmGOTO)
-        LastGOTO = PC
+        LastGOTO = programCounter
         nextLex()
         fixup(CondPC)
         statSeq()
@@ -339,7 +360,6 @@ fun caseStatement() {
         fixup(CondPC)
     skip(END)
     fixup(LastGOTO)*/
-}
 
 fun comparisonWithMark() {
     intExpr()
@@ -454,7 +474,7 @@ fun stFunc(name: String) {
             intExpr()
             Gen(cmDUP); // x, x
             Gen(0)
-            Gen(PC + 3)
+            Gen(programCounter + 3)
             Gen(cmIFGE)
             Gen(cmNEG)
         }

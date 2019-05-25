@@ -11,13 +11,15 @@ VAR
    c: INTEGER;
 BEGIN
     In.Open();
+    i := 2
    CASE c + n * 2 OF
-        i: i := n + d;
+        n..n, n..n : |
+        i + 4: i := n + d;
             i := n + d;
         |n, n : i := n + d;
             i := n + d;
-        |n : i := n + d;
-            i := n + d;
+        |n..n, n..n :
+
         ELSE i := n;
    END;
 END Primes.

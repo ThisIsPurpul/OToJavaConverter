@@ -2,10 +2,10 @@ import java.lang.Math.abs
 import Lex.*
 
 //Генератор кода
-var PC = 0
+var programCounter = 0
 
 fun Gen(cmd: Int) {
-    M[PC++] = cmd
+    M[programCounter++] = cmd
 }
 
 fun GenConst(c: Int) {
@@ -16,7 +16,7 @@ fun GenConst(c: Int) {
 
 fun GenAddr(v: Var) {
     Gen(v.lastAddr)
-    v.lastAddr = PC+1
+    v.lastAddr = programCounter + 1
 }
 
 fun GenComp(op: Lex) {
@@ -34,9 +34,9 @@ fun GenComp(op: Lex) {
 // Адресная привязка
 fun fixup(a: Int) {
     var A = a
-    while( A != 0 ){
-        var temp = M[A-2]
-        M[A-2] = PC
+    while (A != 0) {
+        var temp = M[A - 2]
+        M[A - 2] = programCounter
         A = temp
     }
 }
